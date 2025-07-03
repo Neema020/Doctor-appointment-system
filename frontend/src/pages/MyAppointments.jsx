@@ -395,6 +395,13 @@ const MyAppointments = () => {
   const { backendUrl, token, getDoctorsData } = useContext(AppContext)
   const [appointments, setAppointments] = useState([])
 
+  const months = ["","Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+
+   const slotDateFormat = (slotDate) => {
+         const dateArray = slotDate.split('_')
+     return dateArray[0] + ' ' + months[Number(dateArray[1])] + ' ' + dateArray[2]
+   }
+
   // Fetch user appointments from backend
   const getUserAppointments = async () => {
     try {
@@ -497,7 +504,7 @@ const MyAppointments = () => {
               <p className="text-xs">{item.docData.address.line2}</p>
               <p className="text-xs mt-1">
                 <span className="text-sm text-neutral-700 font-medium">Date & Time:</span>{' '}
-                {item.slotDate} | {item.slotTime}
+                {slotDateFormat(item.slotDate)} | {item.slotTime}
               </p>
             </div>
             <div className="flex flex-col gap-2 justify-end">
