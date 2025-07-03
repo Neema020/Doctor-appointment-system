@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import {v2 as cloudinary} from 'cloudinary'
 import doctorModel from '../models/doctorModel.js'
 import appointmentModel from '../models/appointmentModel.js'
+//import razorpay from 'razorpay'
 
 
 // api to register user
@@ -261,6 +262,47 @@ const cancelAppointment = async (req, res) => {
   }
  }
 
+//  const razorpayInstance = new razorpay({
+//     key_id: process.env.RAZORPAY_KEY_ID,
+//     key_secret: process.env.RAZORPAY_KEY_SECRET
+//  })
+
+//  // API to make payment of appointment using razor pay
+
+//  const paymentRazorPay = async (req, res) => {
 
 
-export {registerUser,loginUser,getProfile,updateProfile,bookAppointment,listAppointment,cancelAppointment}
+//  }
+
+const verifyKhalti = async (req, res) => {
+  try {
+    const { token, amount, appointmentId } = req.body
+
+    const response = await axios.post(
+      'https://khalti.com/api/v2/payment/verify/',
+      { token, amount },
+      {
+        headers: {
+          Authorization: `Key ${process.env.KHALTI_SECRET_KEY}`,
+        },
+      }
+    )
+
+    if (response.data && response.data.idx) {
+      await appointmentModel.findByIdAndUpdate(appointmentId, { payment: true })
+      return res.json({ success: true, message: 'Payment verified successfully' })
+    } else {
+      return res.json({ success: false, message: 'Invalid Khalti response' })
+    }
+  } catch (error) {
+    console.error(error.response?.data || error.message)
+    return res.json({ success: false, message: 'Payment verification failed' })
+  }
+}
+
+
+
+
+
+
+export {registerUser,loginUser,getProfile,updateProfile,bookAppointment,listAppointment,cancelAppointment,verifyKhalti}
